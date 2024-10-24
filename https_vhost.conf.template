@@ -1,0 +1,21 @@
+<VirtualHost *:443>
+	ServerName ${SERVERNAME}
+	
+	RequestHeader unset Expect early
+	
+	## make sure rewrite is enabled
+	RewriteEngine On
+	
+	## SSL directives
+	SSLEngine on
+	SSLCertificateFile      "/etc/letsencrypt/live/${SERVERNAME}/fullchain.pem"
+	SSLCertificateKeyFile   "/etc/letsencrypt/live/${SERVERNAME}/privkey.pem"
+	SSLCACertificatePath    "/etc/ssl/certs"
+	SSLProtocol             all -SSLv3 -TLSv1 -TLSv1.1
+	SSLHonorCipherOrder     On
+	SSLCipherSuite          "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
+	# TODO FIXME reenable after test driving this image for a bit
+	#Header always set Strict-Transport-Security "max-age=31536000"
+	
+	Include conf/goobi-common.conf	
+</VirtualHost>

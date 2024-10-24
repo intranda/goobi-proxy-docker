@@ -1,0 +1,24 @@
+
+    ## WORKFLOW ##
+
+    ProxyPass ${WORKFLOW_PATH}/omnifaces.push/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/ retry=0 timeout=600 upgrade=websocket
+    #ProxyPassReverse ${WORKFLOW_PATH}/omnifaces.push/ ws://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/
+    ProxyPass ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/ retry=0 timeout=600
+    ProxyPassReverse ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/
+    
+    # TODO FIXME: any opinion which of these we should use?
+    redirect 301 ${WORKFLOW_PATH} ${WORKFLOW_PATH}/
+    # RewriteRule ^/${WORKFLOW_PATH}$ /${WORKFLOW_PATH}/ [R,L]
+
+    # TODO sanity check me: this would redirect / to workflow, right?
+    # commented out, because we need to decide where to send people, see above
+    #RewriteRule ^/$ /${WORKFLOW_PATH}/ [R,L]
+
+    ## ITM ##
+
+    # TODO: commented out for a reason? do we never need this?
+    #ProxyPass /${ITM_PATH}/ ajp://${ITM_CONTAINER}:${ITM_AJP_PORT}/${ITM_PATH}/ retry=0
+    #ProxyPassReverse /${ITM_PATH}/ ajp://${ITM_CONTAINER}:${ITM_AJP_PORT}/${ITM_PATH}/
+    #
+    #RewriteRule ^/${ITM_PATH}$ /${ITM_PATH}/ [R,L]
+    #RewriteRule ^/$ /${ITM_PATH}/ [R,L]

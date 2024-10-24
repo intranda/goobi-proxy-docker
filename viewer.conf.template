@@ -1,0 +1,32 @@
+
+    ## VIEWER ##
+    redirect 301 ${VIEWER_PATH} ${VIEWER_PATH}/
+
+    ProxyPass ${VIEWER_PATH}/omnifaces.push/ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/omnifaces.push/ retry=0 upgrade=websocket
+    ProxyPassMatch ^${VIEWER_PATH}/(.*)$ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1 retry=0
+    <LocationMatch ^${VIEWER_PATH}/(.*)$>
+        ProxyPassReverse http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1
+        <IfModule mod_expires.c>
+            ExpiresActive on
+            
+            ExpiresByType image/jpg "access plus 1 months"
+            ExpiresByType image/gif "access plus 1 months"
+            ExpiresByType image/jpeg "access plus 1 months"
+            ExpiresByType image/png "access plus 1 months"
+            
+            ExpiresByType font/ttf "access plus 1 year"
+            ExpiresByType application/x-font-woff "access plus 1 year"
+            ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+        </IfModule>
+        
+        Require all granted
+    </LocationMatch>
+    
+    ## SOLR ##
+    redirect 301 ${SOLR_PATH} ${SOLR_PATH}/
+    <Location ${SOLR_PATH}/>
+        IncludeOptional /usr/local/apache2/conf/solr-restrictions.conf
+        Require all denied
+        ProxyPass http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/ retry=0
+        ProxyPassReverse http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/
+    </Location>
