@@ -1,0 +1,18 @@
+User-agent: *
+Disallow: ${VIEWER_PATH}/content*action=pdf
+Disallow: ${VIEWER_PATH}/rest/pdf/*
+Disallow: ${VIEWER_PATH}/api/v1/records/*/pdf/
+Disallow: ${VIEWER_PATH}/search/
+Disallow: ${VIEWER_PATH}/tags/
+Disallow: ${VIEWER_PATH}/term/
+Disallow: ${VIEWER_PATH}/oai
+Disallow: ${VIEWER_PATH}/nextHit/
+Disallow: ${VIEWER_PATH}/prevHit/
+Disallow: ${VIEWER_PATH}/login/
+Disallow: ${VIEWER_PATH}/crowd/
+Disallow: ${WORKFLOW_PATH}/
+Disallow: /error/
+
+${SITEMAP}
+
+Crawl-delay: 10

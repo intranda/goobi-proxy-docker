@@ -1,6 +1,3 @@
-    ServerAdmin ${SERVERADMIN}
-    DocumentRoot /var/www
-
     <Directory "/var/www/">
         Options Indexes FollowSymLinks MultiViews
         AllowOverride None

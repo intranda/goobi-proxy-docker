@@ -1,5 +1,7 @@
-<VirtualHost *:443>
-	ServerName ${SERVERNAME}
+<VirtualHost *:${HTTPS_PORT}>
+	ServerName ${SERVERNAME}:${PRIMARY_PORT}
+    ServerAdmin ${SERVERADMIN}
+    DocumentRoot /var/www
 	
 	RequestHeader unset Expect early
 	

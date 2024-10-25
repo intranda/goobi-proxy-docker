@@ -1,13 +1,10 @@
-<VirtualHost *:${HTTPD_PORT}>
+<VirtualHost *:${HTTP_PORT}>
 	ServerAdmin ${SERVERADMIN}
-	ServerName ${SERVERNAME}
+	ServerName ${SERVERNAME}:${PRIMARY_PORT}
 	DocumentRoot /var/www
 	
 	RequestHeader unset Expect early
 	
-    # TODO FIXME: either put in the following snippet or goobi-common.conf
-	#rewrite to https except /.well-known for lets encrypt cert renewal
-	RewriteEngine On
-	RewriteCond "%{REQUEST_URI}" "!^/.well-known.*$"
-	RewriteRule "^/?(.*)" "https://%{SERVERNAME}/$1" [R,L]
+    # either redirect to https or use goobi-common.conf
+    Include conf/${REDIR_XOR_COMMOM}
 </VirtualHost>

@@ -18,8 +18,8 @@ ServerRoot "${SERVER_ROOT}"
 # prevent Apache from glomming onto all bound IP addresses.
 #
 #Listen 12.34.56.78:80
-Listen ${HTTPD_PORT}
-
+Listen ${HTTP_PORT}
+${LISTEN_HTTPS}
 #
 # Dynamic Shared Object (DSO) Support
 #
@@ -57,15 +57,10 @@ LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
 LoadModule unixd_module modules/mod_unixd.so
 LoadModule status_module modules/mod_status.so
 LoadModule autoindex_module modules/mod_autoindex.so
-<IfModule !mpm_prefork_module>
-	#LoadModule cgid_module modules/mod_cgid.so
-</IfModule>
-<IfModule mpm_prefork_module>
-	#LoadModule cgi_module modules/mod_cgi.so
-</IfModule>
 LoadModule dir_module modules/mod_dir.so
 LoadModule alias_module modules/mod_alias.so
 LoadModule rewrite_module modules/mod_rewrite.so
+${MOD_REMOTEIP}
 
 <IfModule unixd_module>
 # If you wish httpd to run as a different user or group, you must run
@@ -106,7 +101,7 @@ ServerAdmin ${SERVERADMIN}
 # If your host doesn't have a registered DNS name, enter its IP address here.
 #
 #ServerName www.example.com:80
-ServerName ${SERVERNAME}:${HTTPD_PORT}
+ServerName ${SERVERNAME}:${PRIMARY_PORT}
 
 #
 # Deny access to the entirety of your server's filesystem. You must
