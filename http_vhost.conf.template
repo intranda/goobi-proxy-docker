@@ -6,5 +6,5 @@
 	RequestHeader unset Expect early
 	
     # either redirect to https or use goobi-common.conf
-    Include conf/${REDIR_XOR_COMMOM}
+    Include conf/${REDIR_XOR_COMMON}
 </VirtualHost>

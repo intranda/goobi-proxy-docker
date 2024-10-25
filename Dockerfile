@@ -5,13 +5,25 @@ LABEL org.opencontainers.image.authors="Matthias Geerdsen <matthias.geerdsen@int
 LABEL org.opencontainers.image.source="https://github.com/intranda/goobi-docker-proxy"
 LABEL org.opencontainers.image.description="Goobi combined - http reverse proxy"
 
+# put this first so we don't have to reinstall stuff
+# every time we change a var or a file
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install \
+                tini \
+                gettext-base \
+                certbot \
+               && \
+    rm -rf /var/lib/apt/lists/*
+
+
 ENV SERVER_ROOT="/usr/local/apache2"
 
 ENV ENABLE_SSL=1
 ENV LE_EMAIL="rootmail@intranda.com"
 
-ENV HTTP_PORT=80
-ENV HTTPS_PORT=443
+ENV HTTP_PORT="80"
+ENV HTTPS_PORT="443"
 
 # this must be the fqdn under which this server/image is reachable from the public internet
 # especially important for LetsEncrypt!
@@ -61,15 +73,7 @@ COPY entrypoint.sh /
 
 RUN mkdir -p /var/www && \
     mkdir -p /etc/letsencrypt && \
-    chmod 755 /entrypoint.sh && \
-    apt-get update && \
-    apt-get -y upgrade && \
-    apt-get -y install \
-                tini \
-                gettext-base \
-                certbot \
-               && \
-    rm -rf /var/lib/apt/lists/*
+    chmod 755 /entrypoint.sh
 
 # expose is only for documentation / easy usage of the docker command
 # it has no effect on being able to forward ports
@@ -93,4 +97,5 @@ VOLUME ${SERVER_ROOT}/htdocs
 
 # TODO: maybe use "-g" to send signals to all children as well?
 # not sure in the case of apache
-CMD ["/usr/bin/tini", "--", "/entrypoint.sh"]
+#ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

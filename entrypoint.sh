@@ -16,25 +16,33 @@ set -o pipefail
 # docker run -it rproxy-ssl-apache -t -C "LoadModule info_module modules/mod_info.so" -D DUMP_CONFIG
 EXTRA_ARGS="$@"
 
+
+env
+
 # some conveniece functions
 render_template () {
-    SRC="$1"
-    DEST="$2"
-    VARLIST="$3"
+    local SRC="$1"
+    local DEST="$2"
+    local VARLIST="$3"
 
     RENDERVARS=""
     for MYVAR in $(echo "$VARLIST" | tr " " "\n")
     do
         RENDERVARS="${RENDERVARS} \$${MYVAR}"
     done
+    echo "DBG MYVARS $VARLIST"
+    echo "DBG REVARS $RENDERVARS"
+    echo "rendering template $SRC"
+    echo "to $DEST"
+    echo "with vars: $RENDERVARS"
     envsubst "$RENDERVARS" < "$SRC" > "$DEST"
 }
 
 render_simple () {
-    DEST="$1"
-    VARLIST="$2"
-    SRC="${DEST}.template"
-    render_template $SRC $DEST $VARLIST
+    local DEST="$1"
+    local VARLIST="$2"
+    local SRC="${DEST}.template"
+    render_template "$SRC" "$DEST" "$VARLIST"
 }
 
 APACHE_CONFDIR=${SERVER_ROOT}/conf
@@ -46,15 +54,15 @@ if [[ -v SOLR_INCLUDES ]]; then
 fi
 
 # SSL stuff
-PRIMARY_PORT="${HTTP_PORT}"
-LISTEN_HTTPS=""
-REDIR_OR_COMMON="goobi-common.conf"
+PRIMARY_PORT="$HTTP_PORT"
+LISTEN_HTTPS="# SSL disabled"
+REDIR_XOR_COMMON="goobi-common.conf"
 if [ $ENABLE_SSL -eq 1 ]
 then
     echo "Enabling SSL"
     PRIMARY_PORT="$HTTPS_PORT"
     LISTEN_HTTPS="Listen $HTTPS_PORT"
-    REDIR_OR_COMMON="https_redir.conf"
+    REDIR_XOR_COMMON="https_redir.conf"
 
     # render HTTPS vhost
     SV=""
@@ -62,6 +70,7 @@ then
     SV="${SV} SERVERADMIN"
     SV="${SV} HTTPS_PORT"
     SV="${SV} PRIMARY_PORT"
+    SV="${SV} LISTEN_HTTPS"
     render_simple ${APACHE_CONFDIR}/https_vhost.conf "$SV"
     # get certifcate once / ensure they are current
     echo "Running certbot to get LetsEncrypt Certificates"
@@ -73,6 +82,7 @@ SV=""
 SV="${SV} SERVERNAME"
 SV="${SV} SERVERADMIN"
 SV="${SV} HTTP_PORT"
+SV="${SV} PRIMARY_PORT"
 SV="${SV} REDIR_XOR_COMMON"
 render_simple ${APACHE_CONFDIR}/http_vhost.conf "$SV"
 
@@ -83,7 +93,7 @@ SV="${SV} REDIRECT_INDEX_TO"
 render_simple ${APACHE_CONFDIR}/goobi-common.conf "$SV"
 
 
-MOD_REMOTEIP=""
+MOD_REMOTEIP="# mod_remoteip disabled"
 if [ $USE_MOD_REMOTEIP -eq 1 ]
 then
    echo "Enabling mod_remoteip"
@@ -157,7 +167,7 @@ SV="${SV} SITEMAP"
 render_template ${APACHE_CONFDIR}/robots.txt.template /var/www/robots.txt "$SV"
 
 
-cat ${APACHE_CONFDIR}/httpd.conf
+#cat ${APACHE_CONFDIR}/httpd.conf
 
 
 # TODO: make cronjob for certbot and start cron in the background
@@ -174,4 +184,8 @@ cat ${APACHE_CONFDIR}/httpd.conf
 rm -f ${SERVER_ROOT}/logs/httpd.pid
 
 echo "Starting Apache2..."
+echo "\$0 = $0"
+echo "with extra args:"
+echo "$EXTRA_ARGS"
+cat ${APACHE_CONFDIR}/http_vhost.conf
 exec httpd -DFOREGROUND "$EXTRA_ARGS"
