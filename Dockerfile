@@ -61,6 +61,7 @@ COPY entrypoint.sh /
 
 RUN mkdir -p /var/www && \
     mkdir -p /etc/letsencrypt && \
+    chmod 755 /entrypoint.sh && \
     apt-get update && \
     apt-get -y upgrade && \
     apt-get -y install \
