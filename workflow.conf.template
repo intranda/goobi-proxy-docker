@@ -1,14 +1,21 @@
 
     ## WORKFLOW ##
 
-    ProxyPass ${WORKFLOW_PATH}/omnifaces.push/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/ retry=0 timeout=600 upgrade=websocket
-    #ProxyPassReverse ${WORKFLOW_PATH}/omnifaces.push/ ws://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/
-    ProxyPass ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/ retry=0 timeout=600
-    ProxyPassReverse ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/
-    
     # TODO FIXME: any opinion which of these we should use?
     redirect 301 ${WORKFLOW_PATH} ${WORKFLOW_PATH}/
     # RewriteRule ^/${WORKFLOW_PATH}$ /${WORKFLOW_PATH}/ [R,L]
+
+    # websocket via HTTP (alternative might be mod_proxy_wstunnel, but I'm unsure)
+    ProxyPass ${WORKFLOW_PATH}/omnifaces.push/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/ retry=0 timeout=600 upgrade=websocket
+    #ProxyPassReverse ${WORKFLOW_PATH}/omnifaces.push/ ws://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/
+    # TODO add a variable in Dockerfile to switch the protocol being used on the backend
+    # proxy to via AJP
+    ProxyPass ${WORKFLOW_PATH}/ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/ retry=0 timeout=600
+    ProxyPassReverse ${WORKFLOW_PATH}/ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/
+    # proxy to via HTTP
+    #ProxyPass ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/ retry=0 timeout=600
+    #ProxyPassReverse ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/
+    
 
     # TODO sanity check me: this would redirect / to workflow, right?
     # commented out, because we need to decide where to send people, see above

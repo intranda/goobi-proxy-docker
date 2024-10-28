@@ -2,10 +2,16 @@
     ## VIEWER ##
     redirect 301 ${VIEWER_PATH} ${VIEWER_PATH}/
 
+
+
+
+    # websocket go via HTTP
     ProxyPass ${VIEWER_PATH}/omnifaces.push/ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/omnifaces.push/ retry=0 upgrade=websocket
-    ProxyPassMatch ^${VIEWER_PATH}/(.*)$ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1 retry=0
+    
+    #ProxyPassMatch ^${VIEWER_PATH}/(.*)$ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1 retry=0
+    ProxyPassMatch ^${VIEWER_PATH}/(.*)$ ajp://${VIEWER_CONTAINER}:${VIEWER_AJP_PORT}${VIEWER_PATH}/$1 retry=0
     <LocationMatch ^${VIEWER_PATH}/(.*)$>
-        ProxyPassReverse http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1
+        ProxyPassReverse ajp://${VIEWER_CONTAINER}:${VIEWER_AJP_PORT}${VIEWER_PATH}/$1
         <IfModule mod_expires.c>
             ExpiresActive on
             
