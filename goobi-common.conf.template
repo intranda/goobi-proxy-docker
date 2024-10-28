@@ -76,7 +76,7 @@ ${CUSTOM_CONFIG}
     # TODO decide where to send visitors, viewer? workflow? static content?
     redirect 301 /index.html ${REDIRECT_INDEX_TO}
     # also this maybe?
-    redirect 301 / ${REDIRECT_INDEX_TO}
+    redirectmatch 301 ^/$ ${REDIRECT_INDEX_TO}
 
     IncludeOptional conf/viewer.conf
     IncludeOptional conf/workflow.conf

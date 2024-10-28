@@ -10,8 +10,11 @@
     #ProxyPassReverse ${WORKFLOW_PATH}/omnifaces.push/ ws://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/omnifaces.push/
     # TODO add a variable in Dockerfile to switch the protocol being used on the backend
     # proxy to via AJP
-    ProxyPass ${WORKFLOW_PATH}/ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/ retry=0 timeout=600
-    ProxyPassReverse ${WORKFLOW_PATH}/ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/
+    ProxyPassMatch ^${WORKFLOW_PATH}/(.*)$ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/$1 retry=0 timeout=600
+    <LocationMatch ^${WORKFLOW_PATH}/(.*)$>
+    	ProxyPassReverse ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/$1
+        Require all granted
+    </LocationMatch>
     # proxy to via HTTP
     #ProxyPass ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/ retry=0 timeout=600
     #ProxyPassReverse ${WORKFLOW_PATH}/ http://${WORKFLOW_CONTAINER}:${WORKFLOW_HTTP_PORT}${WORKFLOW_PATH}/
