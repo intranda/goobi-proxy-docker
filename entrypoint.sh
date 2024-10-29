@@ -19,7 +19,15 @@ export LISTEN_HTTPS="# SSL disabled"
 export REDIR_XOR_COMMON="goobi-common.conf"
 
 export MOD_REMOTEIP="# mod_remoteip disabled"
-export SITEMAP=""
+export SITEMAP="# SITEMAP_LOCATION is not set"
+export REDIRECT_INDEX="# REDIRECT_INDEX_TO is not set"
+export REDIRECT_SLASH="# REDIRECT_INDEX_TO is not set"
+
+if [[ "$REDIRECT_INDEX_TO" != "" ]]
+then
+    REDIRECT_INDEX="redirect 301 /index.html ${REDIRECT_INDEX_TO}"
+    REDIRECT_SLASH="redirectmatch 301 ^/$ ${REDIRECT_INDEX_TO}"
+fi
 
 echo ""
 echo "### ENVIRONMENT VARS AT SCRIPT START \\/\\/\\/"
@@ -95,7 +103,8 @@ render_template ${APACHE_CONFDIR}/http_vhost.conf.template \
 # render common config
 SV=""
 SV="${SV} CUSTOM_CONFIG"
-SV="${SV} REDIRECT_INDEX_TO"
+SV="${SV} REDIRECT_INDEX"
+SV="${SV} REDIRECT_SLASH"
 render_template ${APACHE_CONFDIR}/goobi-common.conf.template \
                 ${APACHE_CONFDIR}/goobi-common.conf
 
