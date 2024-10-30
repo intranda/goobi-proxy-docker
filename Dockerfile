@@ -10,7 +10,6 @@ LABEL org.opencontainers.image.description="Goobi combined - http reverse proxy"
 RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get -y install \
-                tini \
                 gettext-base \
                 certbot \
                && \
