@@ -59,6 +59,7 @@ ENV ITM_AJP_PORT=8009
 ENV ITM_PATH="/itm"
 ENV ITM_CONTAINER="itm"
 
+ENV ENABLE_REDIRECT_INDEX=1
 ENV REDIRECT_INDEX_TO="${VIEWER_PATH}/"
 
 COPY httpd.conf.template ${SERVER_ROOT}/conf/httpd.conf.template
