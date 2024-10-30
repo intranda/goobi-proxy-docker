@@ -13,6 +13,7 @@ set -o pipefail
 
 export APACHE_CONFDIR=${SERVER_ROOT}/conf
 export SV=""
+
 # SSL stuff
 export PRIMARY_PORT="$HTTP_PORT"
 export LISTEN_HTTPS="# SSL disabled"
@@ -29,22 +30,9 @@ then
     REDIRECT_SLASH="redirectmatch 301 ^/$ ${REDIRECT_INDEX_TO}"
 fi
 
-echo ""
-echo "### ENVIRONMENT VARS AT SCRIPT START \\/\\/\\/"
-env|sort
-echo "### ENVIRONMENT VARS AT SCRIPT START /\\/\\/\\"
-echo ""
-
 render_template () {
     local SRC="$1"
     local DEST="$2"
-    #local VARLIST="$3"
-
-    echo ""
-    echo "### ENVIRONMENT VARS AT FUNCTION START \\/\\/\\/"
-    env|sort
-    echo "### ENVIRONMENT VARS AT FUNCTION START /\\/\\/\\"
-    echo ""
 
     RENDERVARS=""
     # using $SV global variable here to work around broken
@@ -52,13 +40,10 @@ render_template () {
     for MYVAR in $(echo "$SV" | tr " " "\n")
     do
         RENDERVARS="${RENDERVARS} \$${MYVAR}"
-        VALUE=$(echo "\$${MYVAR}" | envsubst "\$${MYVAR}")
-        echo "${MYVAR}: $VALUE"
     done
-    echo "rendering template $SRC"
-    echo "to $DEST"
-    echo "DBG SV: $SV"
-    echo "with vars: $RENDERVARS"
+    echo "rendering template with vars ${SV}:"
+    echo "${SRC} ->"
+    echo "$DEST"
     envsubst "$RENDERVARS" < "$SRC" > "$DEST"
 }
 
@@ -129,11 +114,6 @@ SV="${SV} MOD_REMOTEIP"
 SV="${SV} REMOTEIP_HEADER"
 SV="${SV} REMOTEIP_INTERNAL_PROXY"
 SV="${SV} CUSTOM_CONFIG"
-# TODO scheint unbenutzt, kann das weg oder ist das zukunftskram?
-#SV="${SV} CONNECTOR_AJP_PORT"
-#SV="${SV} CONNECTOR_HTTP_PORT"
-#SV="${SV} CONNECTOR_PATH"
-#SV="${SV} CONNECTOR_CONTAINER"
 render_template ${APACHE_CONFDIR}/httpd.conf.template \
                 ${APACHE_CONFDIR}/httpd.conf
 
@@ -184,9 +164,6 @@ render_template ${APACHE_CONFDIR}/robots.txt.template \
                 /var/www/robots.txt
 
 
-#cat ${APACHE_CONFDIR}/httpd.conf
-
-
 # TODO: make cronjob for certbot and start cron in the background
 # älternativeley: second container with access to shared volume for
 # letsencrypt config/keys/certs (but then we need to think about how to
@@ -203,5 +180,4 @@ rm -f ${SERVER_ROOT}/logs/httpd.pid
 echo "Starting Apache2..."
 echo "with extra args:"
 echo "$@"
-#cat ${APACHE_CONFDIR}/http_vhost.conf
 exec /usr/local/apache2/bin/httpd -DFOREGROUND "$@"

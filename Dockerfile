@@ -91,13 +91,12 @@ VOLUME /var/www
 # to the server with a hostname, that is not covered by a vhost
 VOLUME ${SERVER_ROOT}/htdocs
 
-# use tini as pid 1, so signals get delivered, zombies reaped...
 # TODO: if we decide to run cron/certbot in this same container,
 # we should probably use some kind of process manager / supervisor instead
 # here is an older comparison, maybe something better has been made since then
 # https://ahmet.im/blog/minimal-init-process-for-containers/
+# for now: just run once, restart the container to get new certs
 
 # TODO: maybe use "-g" to send signals to all children as well?
 # not sure in the case of apache
-#ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
 ENTRYPOINT ["/entrypoint.sh"]
