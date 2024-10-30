@@ -19,7 +19,7 @@ export LISTEN_HTTPS="# SSL disabled"
 export REDIR_XOR_COMMON="goobi-common.conf"
 
 export MOD_REMOTEIP="# mod_remoteip disabled"
-export SITEMAP="# SITEMAP_LOCATION is not set"
+export SITEMAP="# sitemap disabled"
 export REDIRECT_INDEX="# REDIRECT_INDEX_TO is not set"
 export REDIRECT_SLASH="# REDIRECT_INDEX_TO is not set"
 
@@ -171,7 +171,7 @@ fi
 
 
 # render robots.txt, optionally with sitemap
-if [[ "$SITEMAP_LOCATION" != "" ]]
+if [ $ENABLE_SITEMAP -eq 1 ]
 then
     echo "Enabling Sitemap"
     SITEMAP="Sitemap: ${SITEMAP_LOCATION}"
