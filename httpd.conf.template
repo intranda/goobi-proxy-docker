@@ -377,6 +377,10 @@ Include conf/extra/proxy-html.conf
 
 # Secure (SSL/TLS) connections
 #Include conf/extra/httpd-ssl.conf
+# default cache path / size. this may need to be adjusted if "logs" becomes a volume mount
+SSLSessionCache        "shmcb:/usr/local/apache2/logs/ssl_scache(512000)"
+SSLSessionCacheTimeout  300
+SSLStaplingCache        "shmcb:/usr/local/apache2/logs/ocsp(32768)"
 #
 # Note: The following must must be present to support
 #       starting without SSL on platforms with no /dev/random equivalent
