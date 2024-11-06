@@ -1,5 +1,5 @@
 <VirtualHost *:${HTTPS_PORT}>
-	ServerName ${SERVERNAME}:${PRIMARY_PORT}
+	ServerName ${SERVERNAME}:${HTTPS_PORT}
     ServerAdmin ${SERVERADMIN}
     DocumentRoot /var/www
 	
@@ -10,6 +10,10 @@
 	
 	## SSL directives
 	SSLEngine on
+    # default cache path / size. this may need to be adjusted if "logs" becomes a volume mount
+    SSLSessionCache        "shmcb:/usr/local/apache2/logs/ssl_scache(512000)"
+    SSLSessionCacheTimeout  300
+    SSLStaplingCache        "shmcb:/usr/local/apache2/logs/ocsp(32768)"
 	SSLCertificateFile      "/etc/letsencrypt/live/${SERVERNAME}/fullchain.pem"
 	SSLCertificateKeyFile   "/etc/letsencrypt/live/${SERVERNAME}/privkey.pem"
 	SSLCACertificatePath    "/etc/ssl/certs"

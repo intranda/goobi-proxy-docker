@@ -1,6 +1,6 @@
 <VirtualHost *:${HTTP_PORT}>
 	ServerAdmin ${SERVERADMIN}
-	ServerName ${SERVERNAME}:${PRIMARY_PORT}
+	ServerName ${SERVERNAME}:${HTTP_PORT}
 	DocumentRoot /var/www
 	
 	RequestHeader unset Expect early

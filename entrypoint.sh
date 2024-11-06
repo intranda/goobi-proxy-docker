@@ -15,7 +15,6 @@ export APACHE_CONFDIR=${SERVER_ROOT}/conf
 export SV=""
 
 # SSL stuff
-export PRIMARY_PORT="$HTTP_PORT"
 export LISTEN_HTTPS="# SSL disabled"
 export REDIR_XOR_COMMON="goobi-common.conf"
 
@@ -57,7 +56,6 @@ fi
 if [ $ENABLE_SSL -eq 1 ]
 then
     echo "Enabling SSL"
-    PRIMARY_PORT="$HTTPS_PORT"
     LISTEN_HTTPS="Listen $HTTPS_PORT"
     REDIR_XOR_COMMON="https_redir.conf"
 
@@ -66,13 +64,12 @@ then
     SV="${SV} SERVERNAME"
     SV="${SV} SERVERADMIN"
     SV="${SV} HTTPS_PORT"
-    SV="${SV} PRIMARY_PORT"
     SV="${SV} LISTEN_HTTPS"
     render_template ${APACHE_CONFDIR}/https_vhost.conf.template \
                     ${APACHE_CONFDIR}/https_vhost.conf
     # get certifcate once / ensure they are current
     echo "Running certbot to get LetsEncrypt Certificates"
-    certbot certonly --standalone --http-01-port "$HTTP_PORT" --email "$LE_EMAIL" --agree-tos --no-eff-email -d "$SERVERNAME"
+    certbot certonly --non-interactive --standalone --http-01-port "$HTTP_PORT" --keep-until-expiring --email "$LE_EMAIL" --agree-tos --no-eff-email -d "$SERVERNAME"
 fi
 
 # render HTTP vhost
@@ -80,7 +77,6 @@ SV=""
 SV="${SV} SERVERNAME"
 SV="${SV} SERVERADMIN"
 SV="${SV} HTTP_PORT"
-SV="${SV} PRIMARY_PORT"
 SV="${SV} REDIR_XOR_COMMON"
 render_template ${APACHE_CONFDIR}/http_vhost.conf.template \
                 ${APACHE_CONFDIR}/http_vhost.conf
@@ -105,7 +101,6 @@ SV=""
 SV="${SV} SERVER_ROOT"
 SV="${SV} HTTP_PORT"
 SV="${SV} HTTPS_PORT"
-SV="${SV} PRIMARY_PORT"
 SV="${SV} LISTEN_HTTPS"
 SV="${SV} SERVERNAME"
 SV="${SV} SERVERADMIN"
