@@ -22,6 +22,7 @@ pipeline {
             //if (env.GIT_BRANCH == 'origin/master' || env.GIT_BRANCH == 'master') {
             //  dockerimage_public.push("latest")
             //}
+            echo "Current branch: ${env.GIT_BRANCH}"
             if (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop') {
               dockerimage_public.push("develop")
             }
