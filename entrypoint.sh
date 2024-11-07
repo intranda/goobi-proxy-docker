@@ -160,7 +160,7 @@ render_template ${APACHE_CONFDIR}/robots.txt.template \
 
 
 # TODO: make cronjob for certbot and start cron in the background
-# älternativeley: second container with access to shared volume for
+# alternatively: second container with access to shared volume for
 # letsencrypt config/keys/certs (but then we need to think about how to
 # notify apache in case of new certs / regularly restart it just in case
 #
