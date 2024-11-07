@@ -22,7 +22,7 @@ gather information for the following environment variables:
     * set `ENABLE_SSL=1`
     * `LE_EMAIL`: email address for registration with Letsencrypt
     * `HTTPS_PORT`: if different from the default of 443
-    * decide on a path / volume to store Letsencrypt account data and SSL certificates and mount it to /etc/letsencrypt within the container
+    * decide on a path / volume to store Letsencrypt account data and SSL certificates and mount it to `/etc/letsencrypt` within the container
 * if you want to enable access to a Goobi Viewer
     * set `ENABLE_VIEWER=1`
     * set `VIEWER_CONTAINER` to the container name / hostname / IP of the Goobi Viewer
@@ -30,7 +30,7 @@ gather information for the following environment variables:
     * set `ENABLE_WORKFLOW=1`
     * set `WORKFLOW_CONTAINER` to the container name / hostname / IP of the Goobi Workflow
 * if you want to serve static content / a landing page
-    * decide on a path / volume and mount it to /var/www within the container
+    * decide on a path / volume and mount it to `/var/www` within the container
 * all variables can be written to a file like `testenv_nossl`
 * there are further variables in the `Dockerfile` in case your Goobi systems run on non-standard ports, paths, if you want to change the default redirect path etc.
 
