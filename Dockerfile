@@ -18,7 +18,7 @@ RUN apt-get update && \
 ENV SERVER_ROOT="/usr/local/apache2"
 
 ENV ENABLE_SSL=1
-ENV LE_EMAIL="rootmail@intranda.com"
+ENV LE_EMAIL="admin@intranda.com"
 
 ENV HTTP_PORT="80"
 ENV HTTPS_PORT="443"
