@@ -1,7 +1,7 @@
 FROM docker.io/library/httpd:2.4 
 
 LABEL org.opencontainers.image.authors="Moritz Bellach <moritz.bellach@intranda.com>"
-LABEL org.opencontainers.image.source="https://github.com/intranda/goobi-rproxy-docker"
+LABEL org.opencontainers.image.source="https://github.com/intranda/goobi-proxy-docker"
 LABEL org.opencontainers.image.description="Goobi combined - http reverse proxy"
 
 # put this first so we don't have to reinstall stuff
