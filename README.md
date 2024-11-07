@@ -9,7 +9,7 @@ A reverse proxy with ssl (letsencrypt) support for Goobi Workflow and Viewer, ba
 * this repository
 
 ```bash
-sudo apt install docker.io docker-compose # or:
+sudo apt install docker.io docker-compose
 git clone https://github.com/intranda/goobi-proxy-docker.git
 ```
 
