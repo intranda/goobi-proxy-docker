@@ -79,3 +79,4 @@ ${CUSTOM_CONFIG}
 
     IncludeOptional conf/viewer.conf
     IncludeOptional conf/workflow.conf
+    IncludeOptional conf/vocabulary.conf

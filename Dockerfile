@@ -54,6 +54,11 @@ ENV WORKFLOW_AJP_PORT=8009
 ENV WORKFLOW_PATH="/goobi"
 ENV WORKFLOW_CONTAINER="workflow"
 
+ENV ENABLE_VOCABULARY=0
+ENV VOCABULARY_HTTP_PORT=8081
+ENV VOCABULARY_PATH="/vocabulary"
+ENV VOCABULARY_CONTAINER="vocabulary"
+
 ENV ITM_AJP_PORT=8009
 ENV ITM_PATH="/itm"
 ENV ITM_CONTAINER="itm"
@@ -68,6 +73,7 @@ COPY https_redir.conf ${SERVER_ROOT}/conf/https_redir.conf
 COPY goobi-common.conf.template ${SERVER_ROOT}/conf/goobi-common.conf.template
 COPY viewer.conf.template ${SERVER_ROOT}/conf/viewer.conf.template
 COPY workflow.conf.template ${SERVER_ROOT}/conf/workflow.conf.template
+COPY vocabulary.conf.template ${SERVER_ROOT}/conf/vocabulary.conf.template
 COPY robots.txt.template ${SERVER_ROOT}/conf/robots.txt.template
 COPY entrypoint.sh /
 

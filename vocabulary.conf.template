@@ -1,0 +1,8 @@
+
+## Vocabulary ##
+#redirect 301 ${VOCABULARY_PATH} ${VOCABULARY_PATH}/
+ProxyPassMatch ^${VOCABULARY_PATH}/(.*)$ http://${VOCABULARY_CONTAINER}:${VOCABULARY_HTTP_PORT}/$1 retry=0 timeout=600
+<LocationMatch ^${VOCABULARY_PATH}/(.*)$>
+    ProxyPassReverse http://${VOCABULARY_CONTAINER}:${VOCABULARY_HTTP_PORT}/$1
+    Require all granted
+</LocationMatch>

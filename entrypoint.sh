@@ -144,6 +144,17 @@ then
                     ${APACHE_CONFDIR}/workflow.conf
 fi
 
+# render vocabulary config section
+if [ $ENABLE_VOCABULARY -eq 1 ]
+then
+    echo "Enabling Vocabulary"
+    SV=""
+    SV="${SV} VOCABULARY_HTTP_PORT"
+    SV="${SV} VOCABULARY_PATH"
+    SV="${SV} VOCABULARY_CONTAINER"
+    render_template ${APACHE_CONFDIR}/vocabulary.conf.template \
+                    ${APACHE_CONFDIR}/vocabulary.conf
+fi
 
 # render robots.txt, optionally with sitemap
 if [ $ENABLE_SITEMAP -eq 1 ]
