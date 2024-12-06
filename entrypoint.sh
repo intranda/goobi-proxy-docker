@@ -156,6 +156,18 @@ then
                     ${APACHE_CONFDIR}/vocabulary.conf
 fi
 
+# render samples config section
+if [ $ENABLE_SAMPLES -eq 1 ]
+then
+    echo "Enabling Samples"
+    SV=""
+    SV="${SV} SAMPLES_HTTP_PORT"
+    SV="${SV} SAMPLES_PATH"
+    SV="${SV} SAMPLES_CONTAINER"
+    render_template ${APACHE_CONFDIR}/samples.conf.template \
+                    ${APACHE_CONFDIR}/samples.conf
+fi
+
 # render robots.txt, optionally with sitemap
 if [ $ENABLE_SITEMAP -eq 1 ]
 then

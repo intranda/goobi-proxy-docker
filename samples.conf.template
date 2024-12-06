@@ -1,0 +1,9 @@
+
+## Samples ##
+redirect 301 ${SAMPLES_PATH} ${SAMPLES_PATH}/
+ProxyPassMatch ^${SAMPLES_PATH}/(.*)$ http://${SAMPLES_CONTAINER}:${SAMPLES_HTTP_PORT}${SAMPLES_PATH}/$1 retry=0 timeout=600
+<LocationMatch ^${SAMPLES_PATH}/(.*)$>
+    ProxyPassReverse http://${SAMPLES_CONTAINER}:${SAMPLES_HTTP_PORT}/$1
+    RequestHeader set X-Forwarded-Prefix ${SAMPLES_PATH}
+    Require all granted
+</LocationMatch>
