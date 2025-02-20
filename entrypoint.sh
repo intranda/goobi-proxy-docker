@@ -26,9 +26,11 @@ export APACHE_ALIASES="# SERVERALIASES is not set"
 export CERTBOT_ALIASES=""
 
 if [[ -v SERVERALIASES ]]; then
+  if ! [[ -z "$SERVERALIASES" ]]; then
     APACHE_ALIASES="ServerAlias $SERVERALIASES"
     # the leading space in the echo below is important!
     CERTBOT_ALIASES=$(echo -n " $SERVERALIASES" | tr ' ' ',')
+  fi
 fi
 
 if [ $ENABLE_REDIRECT_INDEX -eq 1 ]
