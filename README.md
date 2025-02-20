@@ -16,7 +16,7 @@ git clone https://github.com/intranda/goobi-proxy-docker.git
 ## Usage
 gather information for the following environment variables:
 * `SERVERNAME`: this should be the FQDN / (sub)domain, that points to your (public) IP
-* `SERVERALIASES`: any additional (sub)domains (used for SSL certs and apache config)
+* `SERVERALIASES`: space seperated list of any additional (sub)domains (used for SSL certs and apache config)
 * `SERVERADMIN`: email address to be displayed on error pages
 * `HTTP_PORT`: if different from the default of 80
 * do you want to use SSL? (strongly recommended for public / production systems)
