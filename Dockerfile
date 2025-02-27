@@ -84,6 +84,7 @@ COPY robots.txt.template ${SERVER_ROOT}/conf/robots.txt.template
 COPY entrypoint.sh /
 
 RUN mkdir -p /var/www && \
+    mkdir -p /var/custom_err && \
     mkdir -p /etc/letsencrypt && \
     chmod 755 /entrypoint.sh
 
@@ -97,6 +98,7 @@ EXPOSE ${HTTPS_PORT}
 VOLUME /etc/letsencrypt
 # this is for static content, that might change independently from the image
 VOLUME /var/www
+VOLUME /var/custom_err
 # this is another static content directory, that may be used if one connects
 # to the server with a hostname, that is not covered by a vhost
 VOLUME ${SERVER_ROOT}/htdocs

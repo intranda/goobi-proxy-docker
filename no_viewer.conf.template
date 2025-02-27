@@ -1,0 +1,6 @@
+
+    ## VIEWER ##
+    <Location "${VIEWER_PATH}">
+        ErrorDocument 404 /var/custom_err/no_viewer.html
+    </Location>
+
