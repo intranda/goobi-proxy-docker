@@ -1,5 +1,6 @@
 <VirtualHost *:${HTTPS_PORT}>
 	ServerName ${SERVERNAME}:${HTTPS_PORT}
+	${APACHE_ALIASES}
     ServerAdmin ${SERVERADMIN}
     DocumentRoot /var/www
 	

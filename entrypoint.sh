@@ -22,6 +22,16 @@ export MOD_REMOTEIP="# mod_remoteip disabled"
 export SITEMAP="# sitemap disabled"
 export REDIRECT_INDEX="# REDIRECT_INDEX_TO is not set"
 export REDIRECT_SLASH="# REDIRECT_INDEX_TO is not set"
+export APACHE_ALIASES="# SERVERALIASES is not set"
+export CERTBOT_ALIASES=""
+
+if [[ -v SERVERALIASES ]]; then
+  if ! [[ -z "$SERVERALIASES" ]]; then
+    APACHE_ALIASES="ServerAlias $SERVERALIASES"
+    # the leading space in the echo below is important!
+    CERTBOT_ALIASES=$(echo -n " $SERVERALIASES" | tr ' ' ',')
+  fi
+fi
 
 if [ $ENABLE_REDIRECT_INDEX -eq 1 ]
 then
@@ -62,6 +72,7 @@ then
     # render HTTPS vhost
     SV=""
     SV="${SV} SERVERNAME"
+    SV="${SV} APACHE_ALIASES"
     SV="${SV} SERVERADMIN"
     SV="${SV} HTTPS_PORT"
     SV="${SV} LISTEN_HTTPS"
@@ -69,12 +80,13 @@ then
                     ${APACHE_CONFDIR}/https_vhost.conf
     # get certifcate once / ensure they are current
     echo "Running certbot to get LetsEncrypt Certificates"
-    certbot certonly --non-interactive --standalone --http-01-port "$HTTP_PORT" --keep-until-expiring --email "$LE_EMAIL" --agree-tos --no-eff-email -d "$SERVERNAME"
+    certbot certonly --non-interactive --standalone --http-01-port "$HTTP_PORT" --keep-until-expiring --email "$LE_EMAIL" --agree-tos --no-eff-email -d "${SERVERNAME}${CERTBOT_ALIASES}"
 fi
 
 # render HTTP vhost
 SV=""
 SV="${SV} SERVERNAME"
+SV="${SV} APACHE_ALIASES"
 SV="${SV} SERVERADMIN"
 SV="${SV} HTTP_PORT"
 SV="${SV} REDIR_XOR_COMMON"
