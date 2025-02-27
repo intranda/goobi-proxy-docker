@@ -80,7 +80,16 @@ then
                     ${APACHE_CONFDIR}/https_vhost.conf
     # get certifcate once / ensure they are current
     echo "Running certbot to get LetsEncrypt Certificates"
-    certbot certonly --non-interactive --standalone --http-01-port "$HTTP_PORT" --keep-until-expiring --email "$LE_EMAIL" --agree-tos --no-eff-email -d "${SERVERNAME}${CERTBOT_ALIASES}"
+    certbot certonly \
+        --non-interactive \
+        --standalone \
+        --http-01-port "$HTTP_PORT" \
+        --keep-until-expiring \
+        --email "$LE_EMAIL" \
+        --agree-tos \
+        --no-eff-email \
+        --cert-name "$SERVERNAME" \
+        -d "${SERVERNAME}${CERTBOT_ALIASES}"
 fi
 
 # render HTTP vhost
