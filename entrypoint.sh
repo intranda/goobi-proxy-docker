@@ -147,6 +147,12 @@ then
     echo "Enabling Viewer"
     render_template ${APACHE_CONFDIR}/viewer.conf.template \
                     ${APACHE_CONFDIR}/viewer.conf
+else
+    SV=""
+    SV="${SV} VIEWER_PATH"
+    render_template ${APACHE_CONFDIR}/no_viewer.conf.template \
+                    ${APACHE_CONFDIR}/viewer.conf
+
 fi
 
 # render workflow config section
@@ -162,6 +168,11 @@ then
     SV="${SV} ITM_PATH"
     SV="${SV} ITM_CONTAINER"
     render_template ${APACHE_CONFDIR}/workflow.conf.template \
+                    ${APACHE_CONFDIR}/workflow.conf
+else
+    SV=""
+    SV="${SV} WORKFLOW_PATH"
+    render_template ${APACHE_CONFDIR}/no_workflow.conf.template \
                     ${APACHE_CONFDIR}/workflow.conf
 fi
 
@@ -201,6 +212,29 @@ SV="${SV} WORKFLOW_PATH"
 SV="${SV} SITEMAP"
 render_template ${APACHE_CONFDIR}/robots.txt.template \
                 /var/www/robots.txt
+
+if ! [[ -f /var/custom_err/no_workflow.html ]]; then
+    cat << "EOF" > /var/custom_err/no_workflow.html
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+EOF
+fi
+if ! [[ -f /var/custom_err/no_viewer.html ]]; then
+    cat << "EOF" > /var/custom_err/no_viewer.html
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+EOF
+fi
 
 
 # TODO: make cronjob for certbot and start cron in the background
