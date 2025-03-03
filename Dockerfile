@@ -77,12 +77,11 @@ COPY https_vhost.conf.template ${SERVER_ROOT}/conf/https_vhost.conf.template
 COPY https_redir.conf ${SERVER_ROOT}/conf/https_redir.conf
 COPY goobi-common.conf.template ${SERVER_ROOT}/conf/goobi-common.conf.template
 COPY viewer.conf.template ${SERVER_ROOT}/conf/viewer.conf.template
-COPY no_viewer.conf.template ${SERVER_ROOT}/conf/no_viewer.conf.template
 COPY workflow.conf.template ${SERVER_ROOT}/conf/workflow.conf.template
-COPY no_workflow.conf.template ${SERVER_ROOT}/conf/no_workflow.conf.template
 COPY vocabulary.conf.template ${SERVER_ROOT}/conf/vocabulary.conf.template
 COPY samples.conf.template ${SERVER_ROOT}/conf/samples.conf.template
 COPY robots.txt.template ${SERVER_ROOT}/conf/robots.txt.template
+COPY custom-error.html ${SERVER_ROOT}/conf/custom-error.html
 COPY entrypoint.sh /
 
 RUN mkdir -p /var/www && \

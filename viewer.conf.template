@@ -11,6 +11,8 @@
     #ProxyPassMatch ^${VIEWER_PATH}/(.*)$ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1 retry=0
     ProxyPassMatch ^${VIEWER_PATH}/(.*)$ ajp://${VIEWER_CONTAINER}:${VIEWER_AJP_PORT}${VIEWER_PATH}/$1 retry=0
     <LocationMatch ^${VIEWER_PATH}/(.*)$>
+        ProxyErrorOverride On 503
+        ErrorDocument 503 /var/custom_err/no_viewer.html
         ProxyPassReverse ajp://${VIEWER_CONTAINER}:${VIEWER_AJP_PORT}${VIEWER_PATH}/$1
         <IfModule mod_expires.c>
             ExpiresActive on
@@ -31,6 +33,8 @@
     ## SOLR ##
     redirect 301 ${SOLR_PATH} ${SOLR_PATH}/
     <Location ${SOLR_PATH}/>
+        ProxyErrorOverride On 503
+        ErrorDocument 503 /var/custom_err/no_solr.html
         IncludeOptional /usr/local/apache2/conf/solr-restrictions.conf
         Require all denied
         ProxyPass http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/ retry=0

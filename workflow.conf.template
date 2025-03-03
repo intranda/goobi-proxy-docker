@@ -12,6 +12,8 @@
     # proxy to via AJP
     ProxyPassMatch ^${WORKFLOW_PATH}/(.*)$ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/$1 retry=0 timeout=600
     <LocationMatch ^${WORKFLOW_PATH}/(.*)$>
+        ProxyErrorOverride On 503
+        ErrorDocument 503 /var/custom_err/no_workflow.html
     	ProxyPassReverse ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/$1
         Require all granted
     </LocationMatch>

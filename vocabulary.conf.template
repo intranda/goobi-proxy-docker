@@ -3,6 +3,8 @@
 #redirect 301 ${VOCABULARY_PATH} ${VOCABULARY_PATH}/
 ProxyPassMatch ^${VOCABULARY_PATH}/(.*)$ http://${VOCABULARY_CONTAINER}:${VOCABULARY_HTTP_PORT}/$1 retry=0 timeout=600
 <LocationMatch ^${VOCABULARY_PATH}/(.*)$>
+    ProxyErrorOverride On 503
+    ErrorDocument 503 /var/custom_err/no_vocabulary.html
     ProxyPassReverse http://${VOCABULARY_CONTAINER}:${VOCABULARY_HTTP_PORT}/$1
     RequestHeader set X-Forwarded-Prefix ${VOCABULARY_PATH}
     Require all granted
