@@ -3,4 +3,7 @@
     <Location "${VIEWER_PATH}">
         ErrorDocument 404 /var/custom_err/viewer_disabled.html
     </Location>
+    <Location ${SOLR_PATH}/>
+        ErrorDocument 404 /var/custom_err/viewer_disabled.html
+    </Location>
 

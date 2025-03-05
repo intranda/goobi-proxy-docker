@@ -35,7 +35,7 @@
     <Location ${SOLR_PATH}/>
         ErrorDocument 502 /var/custom_err/solr_dnserror.html
         ErrorDocument 503 /var/custom_err/solr_unreachable.html
-        IncludeOptional /usr/local/apache2/conf/solr-restrictions.conf
+        Include /usr/local/apache2/conf/solr-restrictions.conf
         Require all denied
         ProxyPass http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/ retry=0
         ProxyPassReverse http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/

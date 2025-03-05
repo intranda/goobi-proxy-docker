@@ -57,10 +57,8 @@ render_template () {
 }
 
 
-# -v tests if a var is set
-# new since bash 4.2, if this doesn't work maybe just do: $cmd || true
-if [[ -v SOLR_INCLUDES ]]; then
-    echo -e "$SOLR_INCLUDES" > ${APACHE_CONFDIR}/solr-restrictions.conf
+if [ $INSECURE_SOLR_ACCESSIBLE -eq 1 ]; then
+    echo "Require all granted" > ${APACHE_CONFDIR}/solr-restrictions.conf
 fi
 
 if [ $ENABLE_SSL -eq 1 ]
