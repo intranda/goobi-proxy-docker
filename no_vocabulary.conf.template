@@ -1,0 +1,6 @@
+
+    ## VOCABULARY  ##
+    <Location "${VOCABULARY_PATH}">
+        ErrorDocument 404 /var/custom_err/vocabulary_disabled.html
+    </Location>
+

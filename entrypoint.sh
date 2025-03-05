@@ -202,12 +202,17 @@ SV="${SV} SITEMAP"
 render_template ${APACHE_CONFDIR}/robots.txt.template \
                 /var/www/robots.txt
 
-# copy default 503 if there is no custom one
+# copy default error if there is no custom one
 for BACKEND in "workflow" "vocabulary" "viewer" "solr" ; do
-    if ! [[ -f /var/custom_err/no_${BACKEND}.html ]]; then
-        cp ${APACHE_CONFDIR}/custom-error.html \
-            /var/custom_err/no_${BACKEND}.html
+  for ERRPAGE in "dnserror" "unreachable" "disabled" ; do
+    if ! [[ -f /var/custom_err/${BACKEND}_${ERRPAGE}.html ]]; then
+      SV=""
+      SV="${SV} BACKEND"
+      SV="${SV} ERRPAGE"
+      render_template ${APACHE_CONFDIR}/custom-error.html.template \
+          /var/custom_err/${BACKEND}_${ERRPAGE}.html
     fi
+  done
 done
 
 
