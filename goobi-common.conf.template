@@ -4,6 +4,13 @@
         Require all granted
     </Directory>
 
+    <Directory "/var/custom_err/">
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride None
+        Require all granted
+    </Directory>
+    Alias "/custom_err" "/var/custom_err"
+
     ## Security
     # If set to 'none' the Matomo iFrame does not work anymore
     Header set Content-Security-Policy "frame-ancestors 'self';"
