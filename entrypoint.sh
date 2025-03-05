@@ -147,6 +147,11 @@ then
     echo "Enabling Viewer"
     render_template ${APACHE_CONFDIR}/viewer.conf.template \
                     ${APACHE_CONFDIR}/viewer.conf
+else
+    SV=""
+    SV="${SV} VIEWER_PATH"
+    render_template ${APACHE_CONFDIR}/no_viewer.conf.template \
+                    ${APACHE_CONFDIR}/viewer.conf
 fi
 
 # render workflow config section
@@ -163,6 +168,11 @@ then
     SV="${SV} ITM_CONTAINER"
     render_template ${APACHE_CONFDIR}/workflow.conf.template \
                     ${APACHE_CONFDIR}/workflow.conf
+else
+    SV=""
+    SV="${SV} WORKFLOW_PATH"
+    render_template ${APACHE_CONFDIR}/no_workflow.conf.template \
+                    ${APACHE_CONFDIR}/workflow.conf
 fi
 
 # render vocabulary config section
@@ -174,6 +184,11 @@ then
     SV="${SV} VOCABULARY_PATH"
     SV="${SV} VOCABULARY_CONTAINER"
     render_template ${APACHE_CONFDIR}/vocabulary.conf.template \
+                    ${APACHE_CONFDIR}/vocabulary.conf
+else
+    SV=""
+    SV="${SV} VOCABULARY_PATH"
+    render_template ${APACHE_CONFDIR}/no_vocabulary.conf.template \
                     ${APACHE_CONFDIR}/vocabulary.conf
 fi
 
