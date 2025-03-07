@@ -12,6 +12,7 @@
     # proxy to via AJP
     ProxyPassMatch ^${WORKFLOW_PATH}/(.*)$ ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/$1 retry=0 timeout=600
     <LocationMatch ^${WORKFLOW_PATH}/(.*)$>
+        ErrorDocument 500 /custom_err/workflow_genericerror.html
         ErrorDocument 502 /custom_err/workflow_dnserror.html
         ErrorDocument 503 /custom_err/workflow_unreachable.html
     	ProxyPassReverse ajp://${WORKFLOW_CONTAINER}:${WORKFLOW_AJP_PORT}${WORKFLOW_PATH}/$1

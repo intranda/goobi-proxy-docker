@@ -217,7 +217,7 @@ render_template ${APACHE_CONFDIR}/robots.txt.template \
 
 # copy default error if there is no custom one
 for BACKEND in "workflow" "vocabulary" "viewer" "solr" ; do
-  for ERRPAGE in "dnserror" "unreachable" "disabled" ; do
+  for ERRPAGE in "genericerror" "dnserror" "unreachable" "disabled" ; do
     if ! [[ -f /var/custom_err/${BACKEND}_${ERRPAGE}.html ]]; then
       SV=""
       SV="${SV} BACKEND"
