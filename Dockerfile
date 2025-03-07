@@ -83,6 +83,7 @@ COPY no_workflow.conf.template ${SERVER_ROOT}/conf/no_workflow.conf.template
 COPY vocabulary.conf.template ${SERVER_ROOT}/conf/vocabulary.conf.template
 COPY no_vocabulary.conf.template ${SERVER_ROOT}/conf/no_vocabulary.conf.template
 COPY samples.conf.template ${SERVER_ROOT}/conf/samples.conf.template
+COPY no_samples.conf.template ${SERVER_ROOT}/conf/no_samples.conf.template
 COPY robots.txt.template ${SERVER_ROOT}/conf/robots.txt.template
 COPY custom-error.html.template ${SERVER_ROOT}/conf/custom-error.html.template
 COPY solr-restrictions.conf ${SERVER_ROOT}/conf/solr-restrictions.conf
