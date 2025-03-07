@@ -200,6 +200,11 @@ then
     SV="${SV} SAMPLES_CONTAINER"
     render_template ${APACHE_CONFDIR}/samples.conf.template \
                     ${APACHE_CONFDIR}/samples.conf
+else
+    SV=""
+    SV="${SV} SAMPLES_PATH"
+    render_template ${APACHE_CONFDIR}/no_samples.conf.template \
+                    ${APACHE_CONFDIR}/samples.conf
 fi
 
 # render robots.txt, optionally with sitemap
@@ -216,7 +221,7 @@ render_template ${APACHE_CONFDIR}/robots.txt.template \
                 /var/www/robots.txt
 
 # copy default error if there is no custom one
-for BACKEND in "workflow" "vocabulary" "viewer" "solr" ; do
+for BACKEND in "workflow" "vocabulary" "viewer" "solr" "samples" ; do
   for ERRPAGE in "genericerror" "dnserror" "unreachable" "disabled" ; do
     if ! [[ -f /var/custom_err/${BACKEND}_${ERRPAGE}.html ]]; then
       SV=""
