@@ -1,5 +1,6 @@
 <VirtualHost *:${HTTPS_PORT}>
 	ServerName ${SERVERNAME}:${HTTPS_PORT}
+	${APACHE_ALIASES}
     ServerAdmin ${SERVERADMIN}
     DocumentRoot /var/www
 	
@@ -23,5 +24,16 @@
 	# TODO FIXME reenable after test driving this image for a bit
 	#Header always set Strict-Transport-Security "max-age=31536000"
 	
+    # https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#x-headers
+    # mod_proxy_http already adds these headers by default:
+    # X-Forwarded-For:    The IP address of the client.
+    # X-Forwarded-Host:   The original host requested by the client in the Host HTTP request header.
+    # X-Forwarded-Server: The hostname of the proxy server. 
+    # there is also another option:
+    # https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#proxypreservehost
+    # ProxyPreserveHost: When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the hostname specified in the ProxyPass line.
+    # if the backend supports it, X-Forwarded-Host is the cleaner solution
+    # we almost always want to inform the backend of the protocol though, which isn't sent by default
+    RequestHeader set X-Forwarded-Proto "https"
 	Include conf/goobi-common.conf	
 </VirtualHost>

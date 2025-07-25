@@ -1,0 +1,12 @@
+
+## Samples ##
+redirect 301 ${SAMPLES_PATH} ${SAMPLES_PATH}/
+ProxyPassMatch ^${SAMPLES_PATH}/(.*)$ http://${SAMPLES_CONTAINER}:${SAMPLES_HTTP_PORT}${SAMPLES_PATH}/$1 retry=0 timeout=600
+<LocationMatch ^${SAMPLES_PATH}/(.*)$>
+    ErrorDocument 500 /custom_err/samples_genericerror.html
+    ErrorDocument 502 /custom_err/samples_dnserror.html
+    ErrorDocument 503 /custom_err/samples_unreachable.html
+    ProxyPassReverse http://${SAMPLES_CONTAINER}:${SAMPLES_HTTP_PORT}/$1
+    RequestHeader set X-Forwarded-Prefix ${SAMPLES_PATH}
+    Require all granted
+</LocationMatch>

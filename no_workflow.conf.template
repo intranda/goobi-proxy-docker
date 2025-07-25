@@ -1,0 +1,6 @@
+
+    ## WORKFLOW ##
+    <Location "${WORKFLOW_PATH}">
+        ErrorDocument 404 /custom_err/workflow_disabled.html
+    </Location>
+

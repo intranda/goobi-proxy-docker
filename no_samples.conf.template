@@ -1,0 +1,6 @@
+
+    ## SAMPLES ##
+    <Location "${SAMPLES_PATH}">
+        ErrorDocument 404 /custom_err/samples_disabled.html
+    </Location>
+

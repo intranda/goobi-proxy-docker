@@ -1,9 +1,8 @@
 FROM docker.io/library/httpd:2.4 
 
-LABEL org.opencontainers.image.authors="Matthias Geerdsen <matthias.geerdsen@intranda.com>"
-# TODO FIXME point to new repo
-LABEL org.opencontainers.image.source="https://github.com/intranda/goobi-docker-proxy"
-LABEL org.opencontainers.image.description="Goobi combined - http reverse proxy"
+LABEL org.opencontainers.image.authors="Moritz Bellach <moritz.bellach@intranda.com>"
+LABEL org.opencontainers.image.source="https://github.com/intranda/goobi-proxy-docker"
+LABEL org.opencontainers.image.description="Goobi - http reverse proxy"
 
 # put this first so we don't have to reinstall stuff
 # every time we change a var or a file
@@ -19,7 +18,7 @@ RUN apt-get update && \
 ENV SERVER_ROOT="/usr/local/apache2"
 
 ENV ENABLE_SSL=1
-ENV LE_EMAIL="rootmail@intranda.com"
+ENV LE_EMAIL="admin@intranda.com"
 
 ENV HTTP_PORT="80"
 ENV HTTPS_PORT="443"
@@ -47,13 +46,23 @@ ENV VIEWER_CONTAINER="viewer"
 ENV SOLR_PORT=8983
 ENV SOLR_PATH="/solr"
 ENV SOLR_CONTAINER="solr"
-ENV SOLR_INCLUDES="Require all denied"
+ENV INSECURE_SOLR_ACCESSIBLE=0
 
 ENV ENABLE_WORKFLOW=0
 ENV WORKFLOW_HTTP_PORT=8080
 ENV WORKFLOW_AJP_PORT=8009
-ENV WORKFLOW_PATH="/goobi"
+ENV WORKFLOW_PATH="/workflow"
 ENV WORKFLOW_CONTAINER="workflow"
+
+ENV ENABLE_VOCABULARY=0
+ENV VOCABULARY_HTTP_PORT=8081
+ENV VOCABULARY_PATH="/vocabulary"
+ENV VOCABULARY_CONTAINER="vocabulary"
+
+ENV ENABLE_SAMPLES=0
+ENV SAMPLES_HTTP_PORT=8080
+ENV SAMPLES_PATH="/samples"
+ENV SAMPLES_CONTAINER="samples"
 
 ENV ITM_AJP_PORT=8009
 ENV ITM_PATH="/itm"
@@ -68,11 +77,20 @@ COPY https_vhost.conf.template ${SERVER_ROOT}/conf/https_vhost.conf.template
 COPY https_redir.conf ${SERVER_ROOT}/conf/https_redir.conf
 COPY goobi-common.conf.template ${SERVER_ROOT}/conf/goobi-common.conf.template
 COPY viewer.conf.template ${SERVER_ROOT}/conf/viewer.conf.template
+COPY no_viewer.conf.template ${SERVER_ROOT}/conf/no_viewer.conf.template
 COPY workflow.conf.template ${SERVER_ROOT}/conf/workflow.conf.template
+COPY no_workflow.conf.template ${SERVER_ROOT}/conf/no_workflow.conf.template
+COPY vocabulary.conf.template ${SERVER_ROOT}/conf/vocabulary.conf.template
+COPY no_vocabulary.conf.template ${SERVER_ROOT}/conf/no_vocabulary.conf.template
+COPY samples.conf.template ${SERVER_ROOT}/conf/samples.conf.template
+COPY no_samples.conf.template ${SERVER_ROOT}/conf/no_samples.conf.template
 COPY robots.txt.template ${SERVER_ROOT}/conf/robots.txt.template
+COPY custom-error.html.template ${SERVER_ROOT}/conf/custom-error.html.template
+COPY solr-restrictions.conf ${SERVER_ROOT}/conf/solr-restrictions.conf
 COPY entrypoint.sh /
 
 RUN mkdir -p /var/www && \
+    mkdir -p /var/custom_err && \
     mkdir -p /etc/letsencrypt && \
     chmod 755 /entrypoint.sh
 
@@ -86,6 +104,7 @@ EXPOSE ${HTTPS_PORT}
 VOLUME /etc/letsencrypt
 # this is for static content, that might change independently from the image
 VOLUME /var/www
+VOLUME /var/custom_err
 # this is another static content directory, that may be used if one connects
 # to the server with a hostname, that is not covered by a vhost
 VOLUME ${SERVER_ROOT}/htdocs

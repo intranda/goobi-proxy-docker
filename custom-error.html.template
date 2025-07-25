@@ -1,0 +1,7 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>Error reaching backend: ${ERRPAGE}</title>
+</head><body>
+<h1>Error reaching backend ${BACKEND}<h1>
+<p>The Backend serving this URL could not be reached. Reason: ${ERRPAGE}</p>
+</body></html>

@@ -22,6 +22,16 @@ export MOD_REMOTEIP="# mod_remoteip disabled"
 export SITEMAP="# sitemap disabled"
 export REDIRECT_INDEX="# REDIRECT_INDEX_TO is not set"
 export REDIRECT_SLASH="# REDIRECT_INDEX_TO is not set"
+export APACHE_ALIASES="# SERVERALIASES is not set"
+export CERTBOT_ALIASES=""
+
+if [[ -v SERVERALIASES ]]; then
+  if ! [[ -z "$SERVERALIASES" ]]; then
+    APACHE_ALIASES="ServerAlias $SERVERALIASES"
+    # the leading space in the echo below is important!
+    CERTBOT_ALIASES=$(echo -n " $SERVERALIASES" | tr ' ' ',')
+  fi
+fi
 
 if [ $ENABLE_REDIRECT_INDEX -eq 1 ]
 then
@@ -47,10 +57,8 @@ render_template () {
 }
 
 
-# -v tests if a var is set
-# new since bash 4.2, if this doesn't work maybe just do: $cmd || true
-if [[ -v SOLR_INCLUDES ]]; then
-    echo -e "$SOLR_INCLUDES" > ${APACHE_CONFDIR}/solr-restrictions.conf
+if [ $INSECURE_SOLR_ACCESSIBLE -eq 1 ]; then
+    echo "Require all granted" > ${APACHE_CONFDIR}/solr-restrictions.conf
 fi
 
 if [ $ENABLE_SSL -eq 1 ]
@@ -62,6 +70,7 @@ then
     # render HTTPS vhost
     SV=""
     SV="${SV} SERVERNAME"
+    SV="${SV} APACHE_ALIASES"
     SV="${SV} SERVERADMIN"
     SV="${SV} HTTPS_PORT"
     SV="${SV} LISTEN_HTTPS"
@@ -69,12 +78,22 @@ then
                     ${APACHE_CONFDIR}/https_vhost.conf
     # get certifcate once / ensure they are current
     echo "Running certbot to get LetsEncrypt Certificates"
-    certbot certonly --non-interactive --standalone --http-01-port "$HTTP_PORT" --keep-until-expiring --email "$LE_EMAIL" --agree-tos --no-eff-email -d "$SERVERNAME"
+    certbot certonly \
+        --non-interactive \
+        --standalone \
+        --http-01-port "$HTTP_PORT" \
+        --keep-until-expiring \
+        --email "$LE_EMAIL" \
+        --agree-tos \
+        --no-eff-email \
+        --cert-name "$SERVERNAME" \
+        -d "${SERVERNAME}${CERTBOT_ALIASES}"
 fi
 
 # render HTTP vhost
 SV=""
 SV="${SV} SERVERNAME"
+SV="${SV} APACHE_ALIASES"
 SV="${SV} SERVERADMIN"
 SV="${SV} HTTP_PORT"
 SV="${SV} REDIR_XOR_COMMON"
@@ -126,6 +145,11 @@ then
     echo "Enabling Viewer"
     render_template ${APACHE_CONFDIR}/viewer.conf.template \
                     ${APACHE_CONFDIR}/viewer.conf
+else
+    SV=""
+    SV="${SV} VIEWER_PATH"
+    render_template ${APACHE_CONFDIR}/no_viewer.conf.template \
+                    ${APACHE_CONFDIR}/viewer.conf
 fi
 
 # render workflow config section
@@ -142,8 +166,46 @@ then
     SV="${SV} ITM_CONTAINER"
     render_template ${APACHE_CONFDIR}/workflow.conf.template \
                     ${APACHE_CONFDIR}/workflow.conf
+else
+    SV=""
+    SV="${SV} WORKFLOW_PATH"
+    render_template ${APACHE_CONFDIR}/no_workflow.conf.template \
+                    ${APACHE_CONFDIR}/workflow.conf
 fi
 
+# render vocabulary config section
+if [ $ENABLE_VOCABULARY -eq 1 ]
+then
+    echo "Enabling Vocabulary"
+    SV=""
+    SV="${SV} VOCABULARY_HTTP_PORT"
+    SV="${SV} VOCABULARY_PATH"
+    SV="${SV} VOCABULARY_CONTAINER"
+    render_template ${APACHE_CONFDIR}/vocabulary.conf.template \
+                    ${APACHE_CONFDIR}/vocabulary.conf
+else
+    SV=""
+    SV="${SV} VOCABULARY_PATH"
+    render_template ${APACHE_CONFDIR}/no_vocabulary.conf.template \
+                    ${APACHE_CONFDIR}/vocabulary.conf
+fi
+
+# render samples config section
+if [ $ENABLE_SAMPLES -eq 1 ]
+then
+    echo "Enabling Samples"
+    SV=""
+    SV="${SV} SAMPLES_HTTP_PORT"
+    SV="${SV} SAMPLES_PATH"
+    SV="${SV} SAMPLES_CONTAINER"
+    render_template ${APACHE_CONFDIR}/samples.conf.template \
+                    ${APACHE_CONFDIR}/samples.conf
+else
+    SV=""
+    SV="${SV} SAMPLES_PATH"
+    render_template ${APACHE_CONFDIR}/no_samples.conf.template \
+                    ${APACHE_CONFDIR}/samples.conf
+fi
 
 # render robots.txt, optionally with sitemap
 if [ $ENABLE_SITEMAP -eq 1 ]
@@ -158,9 +220,22 @@ SV="${SV} SITEMAP"
 render_template ${APACHE_CONFDIR}/robots.txt.template \
                 /var/www/robots.txt
 
+# copy default error if there is no custom one
+for BACKEND in "workflow" "vocabulary" "viewer" "solr" "samples" ; do
+  for ERRPAGE in "genericerror" "dnserror" "unreachable" "disabled" ; do
+    if ! [[ -f /var/custom_err/${BACKEND}_${ERRPAGE}.html ]]; then
+      SV=""
+      SV="${SV} BACKEND"
+      SV="${SV} ERRPAGE"
+      render_template ${APACHE_CONFDIR}/custom-error.html.template \
+          /var/custom_err/${BACKEND}_${ERRPAGE}.html
+    fi
+  done
+done
+
 
 # TODO: make cronjob for certbot and start cron in the background
-# älternativeley: second container with access to shared volume for
+# alternatively: second container with access to shared volume for
 # letsencrypt config/keys/certs (but then we need to think about how to
 # notify apache in case of new certs / regularly restart it just in case
 #
