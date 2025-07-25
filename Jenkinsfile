@@ -5,6 +5,12 @@ pipeline {
     buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '15', daysToKeepStr: '90', numToKeepStr: '')
   }
 
+  environment {
+    GHCR_IMAGE_BASE = 'ghcr.io/intranda/goobi-proxy-docker'
+    DOCKERHUB_IMAGE_BASE = 'intranda/goobi-proxy-docker'
+    NEXUS_IMAGE_BASE = 'nexus.intranda.com:4443/goobi-proxy-docker'
+  }
+
   stages {
     stage('prepare') {
       agent any
@@ -14,23 +20,65 @@ pipeline {
     }
     stage('build docker image') {
       agent any
+      when {
+        anyOf {
+          tag "v*"
+          branch 'master'
+          branch 'develop'
+          expression { return env.BRANCH_NAME =~ /_docker$/ }
+        }
+      }
       steps {
-        script{
-          docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
-            dockerimage_public = docker.build("intranda/goobi-proxy-docker:${env.BUILD_ID}_${env.GIT_COMMIT}")
-            //TODO: Activate this once we want the latest build to point to the latest release
-            //if (env.GIT_BRANCH == 'origin/master' || env.GIT_BRANCH == 'master') {
-            //  dockerimage_public.push("latest")
-            //}
-            echo "Current branch: ${env.GIT_BRANCH}"
-            if (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop') {
-              dockerimage_public.push("develop")
-            }
-            //TODO: Tagged releases need to be solved differently here
-            //if (latestTag != '') {
-            //  dockerimage_public.push(latestTag)
-            //}
-          }
+        withCredentials([
+          usernamePassword(
+            credentialsId: 'jenkins-github-container-registry',
+            usernameVariable: 'GHCR_USER',
+            passwordVariable: 'GHCR_PASS'
+          ),
+          usernamePassword(
+            credentialsId: '0b13af35-a2fb-41f7-8ec7-01eaddcbe99d',
+            usernameVariable: 'DOCKERHUB_USER',
+            passwordVariable: 'DOCKERHUB_PASS'
+          ),
+          usernamePassword(
+            credentialsId: 'jenkins-docker',
+            usernameVariable: 'NEXUS_USER',
+            passwordVariable: 'NEXUS_PASS'
+          )
+        ]) {
+          sh '''
+            # Login to registries
+            echo "$GHCR_PASS" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            echo "$DOCKERHUB_PASS" | docker login docker.io -u "$DOCKERHUB_USER" --password-stdin
+            echo "$NEXUS_PASS" | docker login nexus.intranda.com:4443 -u "$NEXUS_USER" --password-stdin
+            
+            # Setup QEMU and Buildx
+            docker buildx create --name multiarch-builder --use || docker buildx use multiarch-builder
+            docker buildx inspect --bootstrap
+
+            # Tag logic
+            TAGS=""
+            if [ ! -z "$TAG_NAME" ]; then
+              TAGS="$TAGS -t $GHCR_IMAGE_BASE:$TAG_NAME -t $DOCKERHUB_IMAGE_BASE:$TAG_NAME -t $NEXUS_IMAGE_BASE:$TAG_NAME"
+            fi
+            if [ "$GIT_BRANCH" = "origin/master" ] || [ "$GIT_BRANCH" = "master" ]; then
+              TAGS="$TAGS -t $GHCR_IMAGE_BASE:latest -t $DOCKERHUB_IMAGE_BASE:latest -t $NEXUS_IMAGE_BASE:latest"
+            elif [ "$GIT_BRANCH" = "origin/develop" ] || [ "$GIT_BRANCH" = "develop" ]; then
+              TAGS="$TAGS -t $GHCR_IMAGE_BASE:develop -t $DOCKERHUB_IMAGE_BASE:develop -t $NEXUS_IMAGE_BASE:develop"
+            elif echo "$GIT_BRANCH" | grep -q "_docker$"; then
+              TAG_SUFFIX=$(echo "$GIT_BRANCH" | sed 's/_docker$//' | sed 's|/|_|g')
+              TAGS="$TAGS -t $GHCR_IMAGE_BASE:$TAG_SUFFIX -t $DOCKERHUB_IMAGE_BASE:$TAG_SUFFIX -t $NEXUS_IMAGE_BASE:$TAG_SUFFIX"
+            else
+              echo "No matching tag, skipping build."
+              exit 0
+            fi
+
+            # Build and push to all registries
+            docker buildx build \
+              --platform linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8,linux/386,linux/mips64le,linux/ppc64le,linux/s390x \
+              $TAGS \
+              --push .
+          '''
         }
       }
     }
