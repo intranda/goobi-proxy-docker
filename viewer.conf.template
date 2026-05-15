@@ -8,13 +8,12 @@
     # websocket go via HTTP
     ProxyPass ${VIEWER_PATH}/omnifaces.push/ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/omnifaces.push/ retry=0 upgrade=websocket
     
-    #ProxyPassMatch ^${VIEWER_PATH}/(.*)$ http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1 retry=0
-    ProxyPassMatch ^${VIEWER_PATH}/(.*)$ ajp://${VIEWER_CONTAINER}:${VIEWER_AJP_PORT}${VIEWER_PATH}/$1 retry=0
     <LocationMatch ^${VIEWER_PATH}/(.*)$>
+        ProxyPassMatch   http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1 retry=0
+        ProxyPassReverse http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/$1
         ErrorDocument 500 /custom_err/viewer_genericerror.html
         ErrorDocument 502 /custom_err/viewer_dnserror.html
         ErrorDocument 503 /custom_err/viewer_unreachable.html
-        ProxyPassReverse ajp://${VIEWER_CONTAINER}:${VIEWER_AJP_PORT}${VIEWER_PATH}/$1
         <IfModule mod_expires.c>
             ExpiresActive on
             
@@ -30,6 +29,30 @@
         
         Require all granted
     </LocationMatch>
+
+    <LocationMatch ^.*/api/v[12]/index/stream.*$>
+      Require all denied
+    </LocationMatch>
+    
+    <LocationMatch ^.*user/resetpw/.*$>
+      Require all denied
+    </LocationMatch>
+    
+    <LocationMatch ^.*tasks/download/monitor\.socket$>
+      Require all denied
+    </LocationMatch>
+
+    <LocationMatch ^/oai(.*)$>
+      Require all granted
+      ProxyPassMatch   http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/oai$1 retry=0
+      ProxyPassReverse http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/oai$1
+    </LocationMatch>
+    
+    <LocationMatch ^/sru(.*)$>
+      Require all granted
+      ProxyPassMatch   http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/sru$1 retry=0
+      ProxyPassReverse http://${VIEWER_CONTAINER}:${VIEWER_HTTP_PORT}${VIEWER_PATH}/sru$1
+    </LocationMatch>
     
     ## SOLR ##
     redirect 301 ${SOLR_PATH} ${SOLR_PATH}/
@@ -38,6 +61,6 @@
         ErrorDocument 502 /custom_err/solr_dnserror.html
         ErrorDocument 503 /custom_err/solr_unreachable.html
         Include /usr/local/apache2/conf/solr-restrictions.conf
-        ProxyPass http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/ retry=0
+        ProxyPass        http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/ retry=0
         ProxyPassReverse http://${SOLR_CONTAINER}:${SOLR_PORT}${SOLR_PATH}/
     </Location>
